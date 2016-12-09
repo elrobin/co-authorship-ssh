@@ -1,0 +1,45 @@
+---
+title: "Notas Coautoría ANECA"
+output: html_notebook
+---
+
+## Consultas y tablas MySQL
+
+*[autores en trabajos SSCI].sql*. Variables:
+- ut2. Id de trabajo
+- inst. Número total de instituciones
+- ines. Número total de instituciones españolas
+- inex. Número total de instituciones extranjeras
+- nau. Número de autores total
+- nauex. Número de autores extranjeros (con errores)
+- naues. Número de autores españoles (con errores)
+- nauext. Número de autores extranjeros
+- nauesp. Número de autores españoles
+- wc. Categorías temáticas
+
+ *[autores y citas].sql*.
+- ut2. Id de trabajo
+- inst. Número total de instituciones
+- ines. Número total de instituciones españolas
+- inex. Número total de instituciones extranjeras
+- nau. Número de autores total
+- nauex. Número de autores extranjeros (con errores)
+- naues. Número de autores españoles (con errores)
+- nauext. Número de autores extranjeros
+- nauesp. Número de autores españoles
+- y0. Citas año de publicación
+- y1. Citas año de publicación más 1
+- y2. Citas año de publicación más 1
+ 
+
+## Código R
+
+Conexión a la base de datos:
+
+```{r}
+library(RMySQL)
+mydb <- dbConnect(MySQL(), user='nicolas', password= 'Valencia', 
+                  dbname='PCES', host='158.42.10.7')
+# No recuerdo mi contraseña. No va.
+```
+Pruebo e importo los datos en CSV.
