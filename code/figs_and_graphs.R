@@ -6,10 +6,11 @@
 library(ggplot2)
 library(readr)
 library(plyr)
+library (Rmisc)
 
 # Import data
 
-data <- read_delim("C:/Users/Usuario/Google Drive/1. Work sync/Work in progress/co-authorship-ssh/data/data_00-13.csv",
+data <- read_delim("C:/Users/nirogar/Google Drive/1. Work sync/Work in progress/co-authorship-ssh/data/data_00-13.csv",
 ";", escape_double = FALSE, col_types = cols(EU_funded = col_logical(),
 colab_group = col_character(), colab_inst = col_logical(),
 colab_inst_ext = col_logical(), sample = col_logical(),
@@ -23,42 +24,6 @@ attach(data.css.edu)
 # Exploring dataset
 data.css.edu$py <- as.factor(py) # Convert py to factors
 
-# Contingency table with n publications by wc and year
-pubs.py.wc <- table(wc, py)
-pubs.py <- table(py)
-
-# Publicaciones por año
-pubs.py <- as.data.frame(pubs.py)
-g <- ggplot(pubs.py, aes(py, weight = Freq))
-g+geom_bar()
-
-# Descriptive indicators by year:
-
-nau.resumen <- ddply(data.css.edu,
-                      .(py), summarize,
-                      avg_au = mean(nau),
-                      std_au = sd(nau),
-#                      cuartil_au = quantile(nau),
-                     avg_auext = mean(nauext),
-                     std_auext = sd(nauext),
-#                     cuartil_auext = quantile(nauext),
-                     avg_auesp = mean(nauesp),
-                     std_auesp = sd(nauesp),
-#                     cuartil_auesp = quantile(nauesp),
-                      avg_ins = mean(ins),
-                    std_ins = sd(ins),
-#                    cuartil_ins = quantile(ins),
-                    avg_ines = mean(ines),
-                    std_ines = sd(ines),
-#                    cuartil_ines = quantile(ines),
-                    avg_ines = mean(ines),
-                    std_ines = sd(ines),
-#                    cuartil_ines = quantile(inex),
-                    avg_inex = mean(inex),
-                    std_inex = sd(inex)
-#                      ,cuartil_inex = quantile(inex)
-)
-
 # Gráfico, promedio de autores, de extranjeros, españoles, instituciones,
 # extranjeras, españolas y año
 
@@ -70,7 +35,42 @@ ggplot(nau.resumen, aes(y=avg_ins, x = py, group=1)) + geom_line() + geom_point(
 ggplot(nau.resumen, aes(y=avg_ines, x = py, group=1)) + geom_line() + geom_point()
 ggplot(nau.resumen, aes(y=avg_inex, x = py, group=1)) + geom_line() + geom_point()
 
-# Figura 1. Promedio de autores en función del tipo de colaboración institucional
+# Figura 1. Distribución de autores e instituciones
+
+  # Crear data frame con recuento de trabajos por número de instituciones
+  insti <- data.frame(table(ins,py))
+  # Añadir factor instituciones
+  insti$factor <- "Instituciones"
+  # Gráfico instituciones
+  p.ins0 <- ggplot(insti, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA)
+  # Reajustar límites
+  yp <- subset(insti, Freq>0)
+  sts <- boxplot.stats(yp$Freq)$stats
+  # Gráfico final instituciones
+  p.ins <- p.ins0 + coord_cartesian(ylim = c(sts[2]/2, max(sts)*0.25)) +
+    labs(title = "A. Instituciones por trabajo",
+         x = "Año de publicación", y = "# de autores") +
+    theme_bw()
+
+  # Crear data frame con recuento de trabajos por número de autores
+  aut <- data.frame(table(nau, py))
+  # Añadir factor instituciones
+  aut$factor <- "Autores"
+  # Gráfico autores
+  p.au0 <- ggplot(aut, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA)
+  # Reajustar límites
+  yp2 <- subset(aut, Freq>0)
+  sts2 <- boxplot.stats(aut$Freq)$stats
+  # Gráfico final instituciones
+  p.au <- p.au0 + coord_cartesian(ylim = c(sts[2]/2, max(sts)*1.05)) +
+    labs(title = "B. Autores por trabajo",
+         x = "Año de publicación", y = "# de autores") +
+    theme_bw()
+
+  #Figura final
+  fig1 <- plot_grid(p.ins, p.au, ncol=1, nrow=2)
+
+# Figura 2. Promedio de autores en función del tipo de colaboración institucional
 nau.resumen2 <- summarySE(data.css.edu,
 measurevar="nau",
 groupvars=c("py","colab_group"))
@@ -80,7 +80,7 @@ nau.resumen2$se[is.na(nau.resumen2$se)] <- 0
 
 pd <- position_dodge(0.1)
 
-fig1 <- ggplot(nau.resumen2, aes(x=py, y=nau, colour=colab_group)) +
+fig2 <- ggplot(nau.resumen2, aes(x=py, y=nau, colour=colab_group)) +
   geom_errorbar(aes(ymin=nau-se, ymax=nau+se, group=colab_group),
   width=.1,
   position=pd) +
@@ -88,7 +88,7 @@ fig1 <- ggplot(nau.resumen2, aes(x=py, y=nau, colour=colab_group)) +
   geom_point()
 
 # Edición de leyenda
-fig1.l <- fig1 +  scale_colour_hue(name="Tipo de colaboración institucional",
+fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
                       breaks= c("Inst_internacionales",
                                 "Inst_nacionales",
                                 "Una_inst"),
