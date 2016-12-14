@@ -42,14 +42,14 @@ ggplot(nau.resumen, aes(y=avg_inex, x = py, group=1)) + geom_line() + geom_point
   # Añadir factor instituciones
   insti$factor <- "Instituciones"
   # Gráfico instituciones
-  p.ins0 <- ggplot(insti, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA)
+  p.ins0 <- ggplot(insti, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA, fill="#377EB8")
   # Reajustar límites
   yp <- subset(insti, Freq>0)
   sts <- boxplot.stats(yp$Freq)$stats
   # Gráfico final instituciones
   p.ins <- p.ins0 + coord_cartesian(ylim = c(sts[2]/2, max(sts)*0.25)) +
-    labs(title = "A. Instituciones por trabajo",
-         x = "Año de publicación", y = "# de autores") +
+    labs(title = "A",
+         x = "Año de publicación", y = "# instituciones") +
     theme_bw()
 
   # Crear data frame con recuento de trabajos por número de autores
@@ -57,14 +57,14 @@ ggplot(nau.resumen, aes(y=avg_inex, x = py, group=1)) + geom_line() + geom_point
   # Añadir factor instituciones
   aut$factor <- "Autores"
   # Gráfico autores
-  p.au0 <- ggplot(aut, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA)
+  p.au0 <- ggplot(aut, aes(factor(py), Freq)) + geom_boxplot(outlier.shape = NA, fill = "#FF7F00")
   # Reajustar límites
   yp2 <- subset(aut, Freq>0)
   sts2 <- boxplot.stats(aut$Freq)$stats
   # Gráfico final instituciones
-  p.au <- p.au0 + coord_cartesian(ylim = c(sts[2]/2, max(sts)*1.05)) +
-    labs(title = "B. Autores por trabajo",
-         x = "Año de publicación", y = "# de autores") +
+  p.au <- p.au0 + coord_cartesian(ylim = c(sts[2]/2, max(sts)*.5)) +
+    labs(title = "B",
+         x = "Año de publicación", y = "# autores") +
     theme_bw()
 
   #Figura final
@@ -85,7 +85,8 @@ fig2 <- ggplot(nau.resumen2, aes(x=py, y=nau, colour=colab_group)) +
   width=.1,
   position=pd) +
   geom_line(aes(group=colab_group)) +
-  geom_point()
+  geom_point() +
+  geom_hline(aes(yintercept = 4), color = "red", linetype = "dashed")
 
 # Edición de leyenda
 fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
@@ -94,10 +95,19 @@ fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
                                 "Una_inst"),
                       labels= c("Internacional",
                                 "Nacional",
-                                "Sin colaboración")) +
+                                "Sin colaboración"),
+                      l=40,
+                      c=30) +
   theme_bw() +
   theme(legend.position = "top") +
   labs(x = "Año de publicación", y = "Promedio de autores")
 
+# Figura 3. Financiación
+  # Subset autores, número de trabajos y factor financiado si/no
+  eu.fund <- data.frame(table(nau, EU_funded))
 
+  fig3 <- qplot(nau, citas, data = data.css.edu, colour=EU_funded)
+  fig3 + geom_vline(xintercept = 4) +
+    geom_hline(aes(yintercept = 6), color = "red") +
+    geom_hline(aes(yintercept = 19), color = "darkblue")
 
