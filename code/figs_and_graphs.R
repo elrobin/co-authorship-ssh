@@ -7,6 +7,7 @@ library(ggplot2)
 library(readr)
 library(plyr)
 library (Rmisc)
+library(cowplot)
 
 # Import data
 
@@ -20,20 +21,7 @@ una_inst = col_logical()), trim_ws = TRUE)
 data.css.edu <- subset(data, subset = sample==1)
 
 attach(data.css.edu)
-
-# Exploring dataset
 data.css.edu$py <- as.factor(py) # Convert py to factors
-
-# Gráfico, promedio de autores, de extranjeros, españoles, instituciones,
-# extranjeras, españolas y año
-
-ggplot(nau.resumen, aes(y=avg_au, x = py, group=1)) + geom_line() + geom_point()
-ggplot(nau.resumen, aes(y=avg_auext, x = py, group=1)) + geom_line() + geom_point()
-ggplot(nau.resumen, aes(y=avg_auesp, x = py, group=1)) + geom_line() + geom_point()
-
-ggplot(nau.resumen, aes(y=avg_ins, x = py, group=1)) + geom_line() + geom_point()
-ggplot(nau.resumen, aes(y=avg_ines, x = py, group=1)) + geom_line() + geom_point()
-ggplot(nau.resumen, aes(y=avg_inex, x = py, group=1)) + geom_line() + geom_point()
 
 # Figura 1. Distribución de autores e instituciones
 
@@ -102,12 +90,80 @@ fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
   theme(legend.position = "top") +
   labs(x = "Año de publicación", y = "Promedio de autores")
 
-# Figura 3. Financiación
-  # Subset autores, número de trabajos y factor financiado si/no
-  eu.fund <- data.frame(table(nau, EU_funded))
+# Figura 3. Financiación, colaboración internacional y citación
+  # Crear grupos basados en colab inter/nacional y financiación europea sí/no
+  data.css.edu$colab_fund <- ifelse(
+    (colab_inst_ext==TRUE) & (EU_funded == TRUE), "EU_inter",
+    ifelse(
+      (colab_inst_ext==TRUE) & (EU_funded == FALSE), "nEU_inter",
+      ifelse(
+        (colab_inst_ext==FALSE) & (EU_funded == TRUE), "EU_nac",
+        ifelse(
+          (colab_inst_ext==FALSE) & (EU_funded == FALSE),"NEU_nAC",NA
+        )
+      )
+    )
+  )
 
-  fig3 <- qplot(nau, citas, data = data.css.edu, colour=EU_funded)
-  fig3 + geom_vline(xintercept = 4) +
-    geom_hline(aes(yintercept = 6), color = "red") +
-    geom_hline(aes(yintercept = 19), color = "darkblue")
+  # Crear factores autores en nueva columna
+  data.css.edu$Autores <- ifelse(
+    (0<nau) & (nau<5), "Entre 1-4 autores", ifelse(
+      (4<nau) & (nau<11), "Entre 5-10 autores", ifelse(
+        (nau>10), ">10 autores", NA)))
 
+  data.css.edu$Autores <- factor(data.css.edu$Autores, levels = c("Entre 1-4 autores", "Entre 5-10 autores", ">10 autores"))
+
+  # Gráfico A. Total de publicaciones
+  pA <-  ggplot(data.css.edu, aes(colab_fund)) +
+    geom_bar(aes(fill = Autores), position = "fill") +
+    coord_flip() +
+    scale_fill_brewer(palette = "Set1") +
+    scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
+                     labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
+    theme_bw() +
+    labs(title = "A. Total de trabajos", x = "", y = "Porcentaje de trabajos") +
+    theme(legend.position="none")
+
+  # Gráfico B. 10% más citado
+  diezmascitado <- subset(data.css.edu, citas>quantile(citas, 0.9))
+
+  pB <-  ggplot(diezmascitado, aes(colab_fund)) +
+    geom_bar(aes(fill = Autores), position = "fill") +
+    coord_flip() +
+    scale_fill_brewer(palette = "Set1") +
+    scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
+                     labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
+    theme_bw() +
+  labs(title = "B. 10% más citado", x = "", y = "Porcentaje de trabajos") +
+    theme(legend.position="none")
+
+  # Gráfico C. 1% más citado
+  unomascitado <- subset(data.css.edu, citas>quantile(citas, 0.99))
+
+  pC <-  ggplot(unomascitado[order(unomascitado$Autores),], aes(colab_fund)) +
+    geom_bar(aes(fill = Autores), position = "fill") +
+    coord_flip() +
+    scale_fill_brewer(palette = "Set1") +
+    scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
+                     labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
+    theme_bw() +
+    labs(title = "C. 1% más citado", x = "", y = "Porcentaje de trabajos") +
+    theme(legend.position="none")
+
+  # Gráfico D. Producción
+  pD <- ggplot(data.css.edu, aes(colab_fund)) +
+    geom_bar(fill = "#377EB8") +
+    scale_fill_brewer(palette = "Set1") +
+    scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
+                     labels=c("Nac.", "Inter.", "Nac. EU", "Inter. EU")) +
+    theme_bw() +
+    labs(title = "D. Número de trabajos por grupo", x = "", y = "Número de trabajos") +
+    theme(legend.position="none")
+
+  #Leyenda
+  legend <- get_legend(pA + theme(legend.position = "bottom"))
+
+  prow <- plot_grid(pA, pB, pC, pD, ncol=2, nrow=2)
+
+  #Figura final
+  fig3 <- plot_grid(prow, legend, ncol = 1, rel_heights = c(1, .2))
