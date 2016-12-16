@@ -121,7 +121,7 @@ fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
     scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
                      labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
     theme_bw() +
-    labs(title = "A. Total de trabajos", x = "", y = "Porcentaje de trabajos") +
+    labs(title = "B. Total producción", x = element_blank(), y = "Porcentaje de trabajos") +
     theme(legend.position="none")
 
   # Gráfico B. 10% más citado
@@ -134,7 +134,7 @@ fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
     scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
                      labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
     theme_bw() +
-  labs(title = "B. 10% más citado", x = "", y = "Porcentaje de trabajos") +
+  labs(title = "C. 10% más citado", x = element_blank(), y = "Porcentaje de trabajos") +
     theme(legend.position="none")
 
   # Gráfico C. 1% más citado
@@ -147,23 +147,47 @@ fig2 <- fig2 +  scale_colour_hue(name="Tipo de colaboración institucional",
     scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
                      labels=c("Nacional", "Internacional", "Nacional EU", "Internacional EU")) +
     theme_bw() +
-    labs(title = "C. 1% más citado", x = "", y = "Porcentaje de trabajos") +
+    labs(title = "D. 1% más citado", x = element_blank(), y = "Porcentaje de trabajos") +
     theme(legend.position="none")
 
   # Gráfico D. Producción
-  pD <- ggplot(data.css.edu, aes(colab_fund)) +
-    geom_bar(fill = "#377EB8") +
-    scale_fill_brewer(palette = "Set1") +
-    scale_x_discrete(breaks= c("NEU_nAC", "nEU_inter","EU_nac","EU_inter"),
-                     labels=c("Nac.", "Inter.", "Nac. EU", "Inter. EU")) +
+
+  pD <- total_prod <- data.css.edu[,c(1,13)]
+  total_prod$citgroup <- "Total producción"
+  diez_prod <- diezmascitado[c(1,13)]
+  diez_prod$citgroup <- "10% más citado"
+  uno_prod <- unomascitado[,c(1,13)]
+  uno_prod$citgroup <- "1% más citado"
+
+  disciplines <- rbind(total_prod,diez_prod,uno_prod)
+
+  disciplines$disc <- factor(disciplines$disc,
+                             levels = c("Salud Publica",
+                                        "Geografia y Urbanismo",
+                                        "Educacion",
+                                        "Otras CC Sociales",
+                                        "CC Informacion",
+                                        "Historia",
+                                        "Sociologia",
+                                        "Antropologia",
+                                        "Ciencias Politicas"))
+
+  colores <- c("#000000", "#999999", "#FFD14C")
+
+  pD <- ggplot(disciplines, aes(disc)) +
+    geom_bar(aes(fill= factor(citgroup)), colour="black") +
     theme_bw() +
-    labs(title = "D. Número de trabajos por grupo", x = "", y = "Número de trabajos") +
-    theme(legend.position="none")
+    scale_fill_manual(values = colores) +
+    labs(title = "A. Distribución por disciplinas",
+         x = element_blank(), y = element_blank()) +
+    theme(legend.title = element_blank(),legend.position = c(.85,.60))
+
 
   #Leyenda
   legend <- get_legend(pA + theme(legend.position = "bottom"))
 
-  prow <- plot_grid(pA, pB, pC, pD, ncol=2, nrow=2)
+  plots <- grid.arrange(pD, pA, pB, pC, layout_matrix = rbind(c(1,1,1),
+                                                              c(2,3,4)))
 
   #Figura final
-  fig3 <- plot_grid(prow, legend, ncol = 1, rel_heights = c(1, .2))
+  fig3 <- plot_grid(plots, legend, ncol = 1, rel_heights = c(1, .2))
