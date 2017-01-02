@@ -11,7 +11,7 @@ library(cowplot)
 
 # Import data
 
-data <- read_delim("C:/Users/nirogar/Google Drive/1. Work sync/Work in progress/co-authorship-ssh/data/data_00-13.csv",
+data <- read_delim("C:/Users/Usuario/Google Drive/1. Work sync/Training/co-authorship-ssh/data/data_00-13.csv",
 ";", escape_double = FALSE, col_types = cols(EU_funded = col_logical(),
 colab_group = col_character(), colab_inst = col_logical(),
 colab_inst_ext = col_logical(), sample = col_logical(),
