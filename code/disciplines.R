@@ -52,12 +52,26 @@ fund.distro <- unique(fund.distro)
   fund.distro.y <- subset(fund.distro, subset = EU_funded==1)
 
 fund.distro.y$disc <- factor(fund.distro.y$disc,
-                           levels = c("Antropologia",
-                                      "Sociologia",
-                                      "Ciencias Politicas",
-                                      "CC de la Informacion y Documentacion",
-                                      "Otras CC Sociales",
-                                      "Educacion"))
+                           levels = c(	"Education & Educational Research",
+                                       "Information Science & Library Science",
+                                       "Education, Scientific Disciplines",
+                                       "Anthropology",
+                                       "Linguistics",
+                                       "Social Sciences, Mathematical Methods",
+                                       "Sociology",
+                                       "Social Sciences, Interdisciplinary",
+                                       "Communication",
+                                       "Political Science",
+                                       "Hospitality, Leisure, Sport & Tourism",
+                                       "Ergonomics",
+                                       "International Relations",
+                                       "Industrial Relations & Labor",
+                                       "Social Issues",
+                                       "Family Studies",
+                                       "Education, Special",
+                                       "Social Work",
+                                       "Area Studies",
+                                       "Ethnic Studies"))
 
 # plot
 d2 <- ggplot(fund.distro.y, aes(disc)) +
