@@ -1,18 +1,34 @@
 # Distribution by discipline #
 #-----------
 
+require(ggplot2)
+
 # Select variables
-disc.distro <- data.css.edu[,c(1, 5, 13)]
+disc.distro <- data.css.edu[,c(1, 5, 12)]
 disc.distro <- unique(disc.distro)
 
 # Edit order of disciplines
 disc.distro$disc <- factor(disc.distro$disc,
-       levels = c("Ciencias Politicas",
-                  "Antropologia",
-                  "Sociologia",
-                  "CC de la Informacion y Documentacion",
-                  "Otras CC Sociales",
-                  "Educacion"))
+       levels = c("Education & Educational Research",
+                  "Information Science & Library Science",
+                  "Education, Scientific Disciplines",
+                  "Anthropology",
+                  "Linguistics",
+                  "Social Sciences, Mathematical Methods",
+                  "Sociology",
+                  "Social Sciences, Interdisciplinary",
+                  "Communication",
+                  "Political Science",
+                  "Hospitality, Leisure, Sport & Tourism",
+                  "Ergonomics",
+                  "International Relations",
+                  "Industrial Relations & Labor",
+                  "Social Issues",
+                  "Family Studies",
+                  "Education, Special",
+                  "Social Work",
+                  "Area Studies",
+                  "Ethnic Studies"))
 
 colores <- c("#999999", "#FFD14C")
 
