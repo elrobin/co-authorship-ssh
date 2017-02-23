@@ -8,32 +8,33 @@ disc.distro <- data.css.edu[,c(1, 5, 12)]
 disc.distro <- unique(disc.distro)
 
 # Edit order of disciplines
-disc.distro$disc <- factor(disc.distro$disc,
-       levels = c("Education & Educational Research",
-                  "Information Science & Library Science",
-                  "Education, Scientific Disciplines",
-                  "Anthropology",
-                  "Linguistics",
-                  "Social Sciences, Mathematical Methods",
-                  "Sociology",
-                  "Social Sciences, Interdisciplinary",
-                  "Communication",
-                  "Political Science",
-                  "Hospitality, Leisure, Sport & Tourism",
-                  "Ergonomics",
-                  "International Relations",
-                  "Industrial Relations & Labor",
-                  "Social Issues",
-                  "Family Studies",
-                  "Education, Special",
-                  "Social Work",
+disc.distro$wc <- factor(disc.distro$wc,
+       levels = c("Ethnic Studies",
                   "Area Studies",
-                  "Ethnic Studies"))
+                  "Social Work",
+                  "Education, Special",
+                  "Family Studies",
+                  "Social Issues",
+                  "Industrial Relations & Labor",
+                  "International Relations",
+                  "Ergonomics",
+                  "Hospitality, Leisure, Sport & Tourism",
+                  "Political Science",
+                  "Communication",
+                  "Social Sciences, Interdisciplinary",
+                  "Sociology",
+                  "Social Sciences, Mathematical Methods",
+                  "Linguistics",
+                  "Anthropology",
+                  "Education, Scientific Disciplines",
+                  "Information Science & Library Science",
+                  "Education & Educational Research"
+                  ))
 
 colores <- c("#999999", "#FFD14C")
 
 # plot
-d1 <- ggplot(disc.distro, aes(disc)) +
+d1 <- ggplot(disc.distro, aes(wc)) +
   geom_bar(aes(fill= factor(colab_inst_ext)), colour="black") +
   theme_bw() + coord_flip() +
   scale_fill_manual(values = colores,
@@ -45,36 +46,37 @@ d1 <- ggplot(disc.distro, aes(disc)) +
 
 # EU Funding
 
-fund.distro <- data.css.edu[,c(1, 13, 17)]
+fund.distro <- data.css.edu[,c(1, 12, 17)]
 fund.distro <- unique(fund.distro)
 
   # Select only funded papers
   fund.distro.y <- subset(fund.distro, subset = EU_funded==1)
 
-fund.distro.y$disc <- factor(fund.distro.y$disc,
-                           levels = c(	"Education & Educational Research",
-                                       "Information Science & Library Science",
-                                       "Education, Scientific Disciplines",
-                                       "Anthropology",
-                                       "Linguistics",
-                                       "Social Sciences, Mathematical Methods",
-                                       "Sociology",
-                                       "Social Sciences, Interdisciplinary",
-                                       "Communication",
-                                       "Political Science",
-                                       "Hospitality, Leisure, Sport & Tourism",
-                                       "Ergonomics",
-                                       "International Relations",
-                                       "Industrial Relations & Labor",
-                                       "Social Issues",
-                                       "Family Studies",
-                                       "Education, Special",
-                                       "Social Work",
-                                       "Area Studies",
-                                       "Ethnic Studies"))
+fund.distro.y$wc <- factor(fund.distro.y$wc,
+                           levels = c("Ethnic Studies",
+                                      "Area Studies",
+                                      "Education, Special",
+                                      "Family Studies",
+                                      "Industrial Relations & Labor",
+                                      "Social Work",
+                                      "Ergonomics",
+                                      "Social Issues",
+                                      "Hospitality, Leisure, Sport & Tourism",
+                                      "Communication",
+                                      "International Relations",
+                                      "Social Sciences, Interdisciplinary",
+                                      "Linguistics",
+                                      "Anthropology",
+                                      "Sociology",
+                                      "Political Science",
+                                      "Social Sciences, Mathematical Methods",
+                                      "Information Science & Library Science",
+                                      "Education, Scientific Disciplines",
+                                      "Education & Educational Research"
+                                      ))
 
 # plot
-d2 <- ggplot(fund.distro.y, aes(disc)) +
+d2 <- ggplot(fund.distro.y, aes(wc)) +
   geom_bar(fill = "DarkGrey", colour="black") +
   theme_bw() + coord_flip() +
   labs(title = "B. Financiación Europea", x = "", y = element_blank())
